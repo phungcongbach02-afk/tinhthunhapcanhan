@@ -4,7 +4,7 @@ import plotly.express as px
 
 # Thiết lập trang Streamlit
 st.set_page_config(
-    page_title="Công Cụ Tính Thuế TNCN Việt Nam bởi sinh viên PHÙNG CÔNG BÁCH",
+    page_title="Công Cụ Tính Thuế TNCN - Phùng Công Bách",
     page_icon="💰",
     layout="wide"
 )
@@ -17,22 +17,31 @@ st.markdown("""
         font-weight: 700;
         color: #1E3A8A;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
-    .metric-card {
-        background-color: #F8FAFC;
-        padding: 1rem;
-        border-radius: 10px;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    .author-badge {
+        background-color: #E0F2FE;
+        color: #0369A1;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        text-align: center;
+        width: fit-content;
+        margin: 0 auto 1.5rem auto;
+        border: 1px solid #BAE6FD;
     }
 </style>
 """, unsafe_allow_html=True)
 
+# Tiêu đề chính
 st.markdown('<div class="main-header">💰 Công Cụ Tính Thuế Thu Nhập Cá Nhân (TNCN)</div>', unsafe_allow_html=True)
-st.caption("Cập nhật theo biểu thuế lũy tiến và mức giảm trừ gia cảnh mới nhất")
+st.markdown('<div class="author-badge">👨‍🎓 Phát triển bởi Sinh viên: PHÙNG CÔNG BÁCH</div>', unsafe_allow_html=True)
 
-# Sidebar - Nhập dữ liệu
+# Sidebar - Thông tin tác giả & Nhập dữ liệu
+st.sidebar.markdown("### 👤 Thông Tin Tác Giả")
+st.sidebar.info("**Sinh viên:** PHÙNG CÔNG BÁCH\n\n*Công cụ hỗ trợ tính thuế TNCN nhanh chóng & chính xác.*")
+st.sidebar.markdown("---")
+
 st.sidebar.header("⚙️ Cấu Hình Thu Nhập")
 
 regulation_year = st.sidebar.radio(
@@ -81,8 +90,7 @@ if apply_insurance:
         format="%d",
         help="Thường là lương Gross hoặc lương tối thiểu vùng/lương đóng BH"
     )
-    # Tỷ lệ đóng BHXH: 8%, BHYT: 1.5%, BHTN: 1% => Tổng 10.5%
-    insurance_amount = min(insurance_salary * 0.105, 4680000)  # Tối đa theo quy định
+    insurance_amount = min(insurance_salary * 0.105, 4680000)
 else:
     insurance_amount = 0
 
@@ -90,7 +98,6 @@ else:
 if is_new_rules:
     SELF_DEDUCTION = 15_500_000
     DEPENDENT_DEDUCTION = 6_200_000
-    # Biểu thuế 5 bậc mới
     TAX_BRACKETS = [
         (10_000_000, 0.05),
         (30_000_000, 0.10),
@@ -101,7 +108,6 @@ if is_new_rules:
 else:
     SELF_DEDUCTION = 11_000_000
     DEPENDENT_DEDUCTION = 4_400_000
-    # Biểu thuế 7 bậc cũ
     TAX_BRACKETS = [
         (5_000_000, 0.05),
         (10_000_000, 0.10),
@@ -117,7 +123,6 @@ total_dependent_deduction = num_dependents * DEPENDENT_DEDUCTION
 total_deductions = SELF_DEDUCTION + total_dependent_deduction + insurance_amount + other_deductions
 taxable_income = max(0, gross_salary - total_deductions)
 
-# Hàm tính thuế từng bậc
 def calculate_pit(income, brackets):
     remaining = income
     previous_limit = 0
@@ -166,7 +171,7 @@ with col4:
 st.markdown("---")
 
 # Tab Chi Tiết
-tab1, tab2, tab3 = st.tabs(["📊 Diễn Giải Chi Tiết", "📋 Chi Tiết Từng Bậc Thuế", "📈 Biểu Đồ Phân PBThu Nhập"])
+tab1, tab2, tab3 = st.tabs(["📊 Diễn Giải Chi Tiết", "📋 Chi Tiết Từng Bậc Thuế", "📈 Biểu Đồ Phân Bổ Thu Nhập"])
 
 with tab1:
     st.subheader("Chi Tiết Các Khoản Khấu Trừ")
@@ -196,7 +201,6 @@ with tab2:
         st.success("🎉 Bạn chưa đạt ngưỡng thu nhập phải nộp thuế TNCN!")
 
 with tab3:
-    # Biểu đồ phân bổ Lương Gross
     data_chart = {
         "Thành phần": ["Lương NET", "Bảo hiểm", "Thuế TNCN"],
         "Số tiền": [net_salary, insurance_amount, pit_tax]
@@ -212,6 +216,11 @@ with tab3:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# Footnote
+# Footer
 st.markdown("---")
-st.caption("📌 *Lưu ý: Công cụ chỉ mang tính chất tham khảo dựa trên quy định biểu thuế mới nhất.*")
+st.markdown(
+    "<div style='text-align: center; color: #64748B; padding: 10px;'>"
+    "© Dự án Công cụ Tính thuế TNCN - Được xây dựng bởi <b>Sinh viên PHÙNG CÔNG BÁCH</b>"
+    "</div>", 
+    unsafe_allow_html=True
+)
