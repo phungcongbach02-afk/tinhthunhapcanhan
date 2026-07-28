@@ -4,7 +4,7 @@ import plotly.express as px
 
 # Thiết lập trang Streamlit
 st.set_page_config(
-    page_title="Công Cụ Tính Thuế TNCN Việt Nam",
+    page_title="Công Cụ Tính Thuế TNCN Việt Nam bởi sinh viên PHÙNG CÔNG BÁCH",
     page_icon="💰",
     layout="wide"
 )
